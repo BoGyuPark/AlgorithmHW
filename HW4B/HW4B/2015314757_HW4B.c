@@ -7,7 +7,7 @@ typedef struct MyStruct
 	int priority;
 	char name[20];
 }Info;
-
+//ì œëŒ€ë¡œ ìˆ˜ì •ì´ ë˜ëŠ”ì§€ TEST
 void DFS(int i);
 int matrix[100][100] = { 0, };
 int visited[100], count = 0;
@@ -18,20 +18,20 @@ main()
 	char inputString[2000];
 	int len = 0;
 	
-	//N°ú C °ª ÀĞ±â
+	//Nê³¼ C ê°’ ì½ê¸°
 	scanf("%d %d", &N, &C);
 	getchar();
 
-	//ÇÑÁÙ ÀÔ·Â¹Ş±â
+	//í•œì¤„ ì…ë ¥ë°›ê¸°
 	fgets(inputString, strlen(inputString), stdin);
 
-	//String ³¡¿¡ \n Á¦°ÅÇÏ±â
+	//String ëì— \n ì œê±°í•˜ê¸°
 	inputString[strlen(inputString) - 1] = '\0';
 
 	/*len = strlen(inputString);
-	printf("strtok »ç¿ë½Ã \n");*/
+	printf("strtok ì‚¬ìš©ì‹œ \n");*/
 	
-	// '/'·Î ±¸ºĞÇÏ¿© °¢ ±¸Á¶Ã¼¿¡ Name³Ö°í ÃÊ±â°ª priority = 1 ·Î ¼¼ÆÃ
+	// '/'ë¡œ êµ¬ë¶„í•˜ì—¬ ê° êµ¬ì¡°ì²´ì— Nameë„£ê³  ì´ˆê¸°ê°’ priority = 1 ë¡œ ì„¸íŒ…
 	Info info[100];
 	
 	char *ptr = strtok(inputString, "/");
@@ -45,18 +45,18 @@ main()
 		count++; i++;
 	}
 
-	////°¢ NameÀÌ Á¦´ë·Î ÀÔ·ÂµÇ¾ú³ª Ã¼Å©
+	////ê° Nameì´ ì œëŒ€ë¡œ ì…ë ¥ë˜ì—ˆë‚˜ ì²´í¬
 	//for (int j = 0; j < count; j++) {
 	//	printf("%s\n", info[j].name);
 	//}
 
-	// C¹ø ÀÔ·Â¹Ş´Â´Ù. -> adjacency Matrix¸¦ ¼¼ÆÃÇÑ´Ù.
+	// Cë²ˆ ì…ë ¥ë°›ëŠ”ë‹¤. -> adjacency Matrixë¥¼ ì„¸íŒ…í•œë‹¤.
 	while (C) {
 		char tempString[40] = { 0, };
 		fgets(tempString, 40, stdin);
 		tempString[strlen(tempString) - 1] = '\0';
 
-		// '/' ±âÁØÀ¸·Î ¾ÕÀÇ temp1À» µÚ¿¡ temp2¸¦ ´ëÀÔÇÑ´Ù.
+		// '/' ê¸°ì¤€ìœ¼ë¡œ ì•ì˜ temp1ì„ ë’¤ì— temp2ë¥¼ ëŒ€ì…í•œë‹¤.
 		char *pptr = strtok(tempString, "/");
 		char temp1[20], temp2[20];
 		strcpy(temp1, pptr);
@@ -78,7 +78,7 @@ main()
 
 	}
 
-	//Matrix È®ÀÎÀ» À§ÇÑ print
+	//Matrix í™•ì¸ì„ ìœ„í•œ print
 	for (int b = 0; b < count; b++) {
 		for (int d = 0; d < count; d++) {
 			printf("%d ", matrix[b][d]);
@@ -86,10 +86,10 @@ main()
 		printf("\n");
 	}
 
-	//indegree°¡ 0ÀÎ °æ¿ì¸¦ Ã£´Â´Ù.
-	//¸ğµç V°¡ indegree°¡ 0ÀÌ¸é cycleÀÌ »ı±â¹Ç·Î Stupid David! Ãâ·ÂÇÑ´Ù.
+	//indegreeê°€ 0ì¸ ê²½ìš°ë¥¼ ì°¾ëŠ”ë‹¤.
+	//ëª¨ë“  Vê°€ indegreeê°€ 0ì´ë©´ cycleì´ ìƒê¸°ë¯€ë¡œ Stupid David! ì¶œë ¥í•œë‹¤.
 	int indegree = 0;
-	//V¹è¿­Àº indegree°¡ 0ÀÎ ¿­ÀÇ ÀÎµ¦½º¸¦ ÀúÀåÇÑ´Ù. ÃÊ±â°ª -1·Î ¼¼ÆÃÇÑ´Ù.
+	//Vë°°ì—´ì€ indegreeê°€ 0ì¸ ì—´ì˜ ì¸ë±ìŠ¤ë¥¼ ì €ì¥í•œë‹¤. ì´ˆê¸°ê°’ -1ë¡œ ì„¸íŒ…í•œë‹¤.
 	int V[100];
 	for (int q = 0; q < 100; q++)
 		V[q] = -1;
@@ -99,19 +99,19 @@ main()
 	for (int b = 0; b < count; b++) {
 		int sum = 0;
 		for (int d = 0; d < count; d++) {
-			//°¢ colÀÇ ¿ä¼ÒÀÇ ÇÕÀÌ indegree °ªÀÌ´Ù.
+			//ê° colì˜ ìš”ì†Œì˜ í•©ì´ indegree ê°’ì´ë‹¤.
 			sum += matrix[d][b];
 		}
 		if (sum == 0) {
 			V[pos] = b;
 			pos++;
-			printf("matrix %d ¿­Àº indegree°¡ 0ÀÌ´Ù\n", b);
+			printf("matrix %d ì—´ì€ indegreeê°€ 0ì´ë‹¤\n", b);
 		}
 		else {
 			indegree++;
 		}
 
-		//cycleÀÌ »ı±â´Â °æ¿ì
+		//cycleì´ ìƒê¸°ëŠ” ê²½ìš°
 		if (indegree == count)
 			printf("Stupid David!\n");
 
