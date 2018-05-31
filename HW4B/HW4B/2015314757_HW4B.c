@@ -1,62 +1,68 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#define MAX 100  
 
 typedef struct MyStruct
 {
-	int priority;
+	int parent;
+	int distance;
 	char name[20];
 }Info;
-//ì œëŒ€ë¡œ ìˆ˜ì •ì´ ë˜ëŠ”ì§€ TEST
-void DFS(int i);
-int matrix[100][100] = { 0, };
-int visited[100], count = 0;
+
+void BFS(int v);
+int rear, front;
+int matrix[MAX][MAX] = { 0, };
+int visited[MAX], count = 0;
+int queue[MAX];
+
+Info info[100];
 
 main()
 {
 	int N = 0, C = 0;		// 1<= N <100 , 1<= C < 1000 , 1<= length of animal name < 20
 	char inputString[2000];
 	int len = 0;
-	
-	//Nê³¼ C ê°’ ì½ê¸°
+
+	//N°ú C °ª ÀĞ±â
 	scanf("%d %d", &N, &C);
 	getchar();
 
-	//í•œì¤„ ì…ë ¥ë°›ê¸°
+	//ÇÑÁÙ ÀÔ·Â¹Ş±â
 	fgets(inputString, strlen(inputString), stdin);
 
-	//String ëì— \n ì œê±°í•˜ê¸°
+	//String ³¡¿¡ \n Á¦°ÅÇÏ±â
 	inputString[strlen(inputString) - 1] = '\0';
 
 	/*len = strlen(inputString);
-	printf("strtok ì‚¬ìš©ì‹œ \n");*/
-	
-	// '/'ë¡œ êµ¬ë¶„í•˜ì—¬ ê° êµ¬ì¡°ì²´ì— Nameë„£ê³  ì´ˆê¸°ê°’ priority = 1 ë¡œ ì„¸íŒ…
-	Info info[100];
-	
+	printf("strtok »ç¿ë½Ã \n");*/
+
+	// '/'·Î ±¸ºĞÇÏ¿© °¢ ±¸Á¶Ã¼¿¡ Name³Ö°í ÃÊ±â°ª priority = 1 ·Î ¼¼ÆÃ
+
 	char *ptr = strtok(inputString, "/");
 	int i = 0;
 	while (ptr != NULL)
 	{
-		info[i].priority = 1;
+		info[i].distance = 1;
+		info[i].parent = -1;
 		strcpy(info[i].name, ptr);
 		//printf("%s\n", ptr);
 		ptr = strtok(NULL, "/");
 		count++; i++;
 	}
 
-	////ê° Nameì´ ì œëŒ€ë¡œ ì…ë ¥ë˜ì—ˆë‚˜ ì²´í¬
+	////°¢ NameÀÌ Á¦´ë·Î ÀÔ·ÂµÇ¾ú³ª Ã¼Å©
 	//for (int j = 0; j < count; j++) {
 	//	printf("%s\n", info[j].name);
 	//}
 
-	// Cë²ˆ ì…ë ¥ë°›ëŠ”ë‹¤. -> adjacency Matrixë¥¼ ì„¸íŒ…í•œë‹¤.
+	// C¹ø ÀÔ·Â¹Ş´Â´Ù. -> adjacency Matrix¸¦ ¼¼ÆÃÇÑ´Ù.
 	while (C) {
 		char tempString[40] = { 0, };
 		fgets(tempString, 40, stdin);
 		tempString[strlen(tempString) - 1] = '\0';
 
-		// '/' ê¸°ì¤€ìœ¼ë¡œ ì•ì˜ temp1ì„ ë’¤ì— temp2ë¥¼ ëŒ€ì…í•œë‹¤.
+		// '/' ±âÁØÀ¸·Î ¾ÕÀÇ temp1À» µÚ¿¡ temp2¸¦ ´ëÀÔÇÑ´Ù.
 		char *pptr = strtok(tempString, "/");
 		char temp1[20], temp2[20];
 		strcpy(temp1, pptr);
@@ -78,7 +84,7 @@ main()
 
 	}
 
-	//Matrix í™•ì¸ì„ ìœ„í•œ print
+	//Matrix È®ÀÎÀ» À§ÇÑ print
 	for (int b = 0; b < count; b++) {
 		for (int d = 0; d < count; d++) {
 			printf("%d ", matrix[b][d]);
@@ -86,10 +92,10 @@ main()
 		printf("\n");
 	}
 
-	//indegreeê°€ 0ì¸ ê²½ìš°ë¥¼ ì°¾ëŠ”ë‹¤.
-	//ëª¨ë“  Vê°€ indegreeê°€ 0ì´ë©´ cycleì´ ìƒê¸°ë¯€ë¡œ Stupid David! ì¶œë ¥í•œë‹¤.
+	//indegree°¡ 0ÀÎ °æ¿ì¸¦ Ã£´Â´Ù.
+	//¸ğµç V°¡ indegree°¡ 0ÀÌ¸é cycleÀÌ »ı±â¹Ç·Î Stupid David! Ãâ·ÂÇÑ´Ù.
 	int indegree = 0;
-	//Vë°°ì—´ì€ indegreeê°€ 0ì¸ ì—´ì˜ ì¸ë±ìŠ¤ë¥¼ ì €ì¥í•œë‹¤. ì´ˆê¸°ê°’ -1ë¡œ ì„¸íŒ…í•œë‹¤.
+	//V¹è¿­Àº indegree°¡ 0ÀÎ ¿­ÀÇ ÀÎµ¦½º¸¦ ÀúÀåÇÑ´Ù. ÃÊ±â°ª -1·Î ¼¼ÆÃÇÑ´Ù.
 	int V[100];
 	for (int q = 0; q < 100; q++)
 		V[q] = -1;
@@ -98,41 +104,99 @@ main()
 	int pos = 0;
 	for (int b = 0; b < count; b++) {
 		int sum = 0;
+		queue[b] = -1;
 		for (int d = 0; d < count; d++) {
-			//ê° colì˜ ìš”ì†Œì˜ í•©ì´ indegree ê°’ì´ë‹¤.
+			//°¢ colÀÇ ¿ä¼ÒÀÇ ÇÕÀÌ indegree °ªÀÌ´Ù.
 			sum += matrix[d][b];
 		}
 		if (sum == 0) {
 			V[pos] = b;
 			pos++;
-			printf("matrix %d ì—´ì€ indegreeê°€ 0ì´ë‹¤\n", b);
+			printf("matrix %d ¿­Àº indegree°¡ 0ÀÌ´Ù\n", b);
 		}
 		else {
 			indegree++;
 		}
 
-		//cycleì´ ìƒê¸°ëŠ” ê²½ìš°
-		if (indegree == count)
+		//cycleÀÌ »ı±â´Â °æ¿ì
+		if (indegree == count) {
 			printf("Stupid David!\n");
+			return 0;
+		}
 
 	}
-	
+
 	for (int x = 0; x < pos; x++) {
-		DFS(V[x]);
+		BFS(V[x]);
+	}
+
+	// info¹è¿­ lexicographically order Á¤·Ä
+	for (int w = 0; w < count - 1; ++w) 
+	{
+		for (int e = w + 1; e < count; ++e) 
+		{
+			if (strcmp(info[w].name, info[e].name) > 0)
+			{
+				Info temp;
+				temp = info[w];
+				info[w] = info[e];
+				info[e] = temp;
+				
+			}
+		}
+	}
+
+	// info¹è¿­À» distance ¿À¸§Â÷¼øÀ¸·Î Á¤·Ä
+	for (int w = 0; w < count - 1; ++w)
+	{
+		for (int e = w + 1; e < count; ++e)
+		{
+			if (info[w].distance>info[e].distance)
+			{
+				Info temp;
+				temp = info[w];
+				info[w] = info[e];
+				info[e] = temp;
+
+			}
+		}
+	}
+	
+
+
+
+	for (int i = 0; i < count; i++) {
+		printf("%d %s\n", info[i].distance, info[i].name);
 	}
 
 
 }
 
-void DFS(int i)
+void BFS(int v)
 {
-	int j;
-	visited[i] = 1;
-	int distance = 0;
-	printf(" %d->", i + 1);
-	for (j = 0; j < count; j++)
+	int i;
+	visited[v] = 1; // Á¤Á¡ v¸¦ ¹æ¹®Çß´Ù°í Ç¥½Ã
+	//printf("%d¿¡¼­ ½ÃÀÛ\n", v);
+
+	queue[rear++] = v; // Å¥¿¡ v¸¦ »ğÀÔÇÏ°í ÈÄ´ÜÀ» 1 Áõ°¡½ÃÅ´
+
+	while (front < rear) // ÈÄ´ÜÀÌ Àü´Ü°ú °°°Å³ª ÀÛÀ¸¸é ·çÇÁ Å»Ãâ
 	{
-		if (matrix[i][j] == 1 && visited[j] == 0)
-			DFS(j);
+		// Å¥ÀÇ Ã¹¹øÂ°¿¡ ÀÖ´Â µ¥ÀÌÅÍ¸¦ Á¦¿ÜÇÏ°í Á¦¿ÜµÈ °ªÀ» °¡Á®¿À¸ç, Àü´Ü 1 Áõ°¡
+		v = queue[front++];
+		for (i = 0; i < count; i++)
+		{
+			// Á¤Á¡ v¿Í Á¤Á¡ i°¡ ¸¸³ª°í, Á¤Á¡ i¸¦ ¹æ¹®ÇÏÁö ¾ÊÀº »óÅÂÀÏ °æ¿ì
+			if (matrix[v][i] == 1)
+			{
+				visited[i] = 1; // Á¤Á¡ i¸¦ ¹æ¹®Çß´Ù°í Ç¥½Ã
+				if (info[i].distance < info[v].distance + 1) {
+					info[i].parent = v;
+					info[i].distance = info[v].distance + 1;
+				}
+				//printf("%d¿¡¼­ %d·Î ÀÌµ¿\n", v, i);
+				queue[rear++] = i; // Å¥¿¡ i¸¦ »ğÀÔÇÏ°í ÈÄ´ÜÀ» 1 Áõ°¡½ÃÅ´
+			}
+		}
 	}
 }
