@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#define MAX 100  
+#define MAX 101
 
 typedef struct MyStruct
 {
@@ -11,34 +11,30 @@ typedef struct MyStruct
 }Info;
 
 void BFS(int v);
-int rear, front;
+int rear, front, count = 0;
 int matrix[MAX][MAX] = { 0, };
-int visited[MAX], count = 0;
 int queue[MAX];
 
-Info info[100];
+Info info[MAX];
 
 main()
 {
-	int N = 0, C = 0;		// 1<= N <100 , 1<= C < 1000 , 1<= length of animal name < 20
+	// 1<= N <100 , 1<= C < 1000 , 1<= length of animal name < 20
+	int N = 0, C = 0;		
 	char inputString[2000];
 	int len = 0;
 
-	//N과 C 값 읽기
+	//scan N,C 
 	scanf("%d %d", &N, &C);
 	getchar();
 
-	//한줄 입력받기
+	//Get oneline
 	fgets(inputString, strlen(inputString), stdin);
 
-	//String 끝에 \n 제거하기
+	//Remove \n at the end of a String
 	inputString[strlen(inputString) - 1] = '\0';
 
-	/*len = strlen(inputString);
-	printf("strtok 사용시 \n");*/
-
-	// '/'로 구분하여 각 구조체에 Name넣고 초기값 priority = 1 로 세팅
-
+	// input'Name' for each structure separated by '/', and initialize distance and parent values.
 	char *ptr = strtok(inputString, "/");
 	int i = 0;
 	while (ptr != NULL)
@@ -51,18 +47,13 @@ main()
 		count++; i++;
 	}
 
-	////각 Name이 제대로 입력되었나 체크
-	//for (int j = 0; j < count; j++) {
-	//	printf("%s\n", info[j].name);
-	//}
-
-	// C번 입력받는다. -> adjacency Matrix를 세팅한다.
+	// Input C times and set adjacency Matrix
 	while (C) {
 		char tempString[40] = { 0, };
 		fgets(tempString, 40, stdin);
 		tempString[strlen(tempString) - 1] = '\0';
 
-		// '/' 기준으로 앞의 temp1을 뒤에 temp2를 대입한다.
+		//After dividing by slash, assign the first part to temp1 and the second part to temp2.
 		char *pptr = strtok(tempString, "/");
 		char temp1[20], temp2[20];
 		strcpy(temp1, pptr);
@@ -77,94 +68,77 @@ main()
 			if (!strcmp(temp2, info[j].name))
 				col = j;
 		}
-
 		matrix[row][col] = 1;
-
 		C--;
-
 	}
 
-	//Matrix 확인을 위한 print
-	for (int b = 0; b < count; b++) {
-		for (int d = 0; d < count; d++) {
-			printf("%d ", matrix[b][d]);
-		}
-		printf("\n");
-	}
-
-	//indegree가 0인 경우를 찾는다.
-	//모든 V가 indegree가 0이면 cycle이 생기므로 Stupid David! 출력한다.
-	int indegree = 0;
-	//V배열은 indegree가 0인 열의 인덱스를 저장한다. 초기값 -1로 세팅한다.
-	int V[100];
-	for (int q = 0; q < 100; q++)
+	
+	//The V array stores the index of the column with indegree = 0. The initial value is set to - 1.
+	int V[MAX];
+	for (int q = 0; q < MAX; q++)
 		V[q] = -1;
 
-
+	//Finds if indegree is zero.
+	//If all V's have an indegree greater than 1, a cycle will occur, so print "Stupid David!".
+	int indegree = 0;
 	int pos = 0;
 	for (int b = 0; b < count; b++) {
-		int sum = 0;
+		int indegreeSum = 0;
 		queue[b] = -1;
 		for (int d = 0; d < count; d++) {
-			//각 col의 요소의 합이 indegree 값이다.
-			sum += matrix[d][b];
+			//The sum of the elements in each column is indegreeSum.
+			indegreeSum += matrix[d][b];
 		}
-		if (sum == 0) {
+		if (indegreeSum == 0) {
 			V[pos] = b;
 			pos++;
-			printf("matrix %d 열은 indegree가 0이다\n", b);
 		}
 		else {
 			indegree++;
 		}
 
-		//cycle이 생기는 경우
+		//When a cycle occurs
 		if (indegree == count) {
 			printf("Stupid David!\n");
 			return 0;
 		}
-
 	}
 
+	//Apply a vertex with indegree = 0 to the BFS function.
 	for (int x = 0; x < pos; x++) {
 		BFS(V[x]);
 	}
 
-	// info배열 lexicographically order 정렬
-	for (int w = 0; w < count - 1; ++w) 
+	Info temp;
+	//Sort the info array lexicographically.
+	for (int i = count - 1; i>0; i--)
 	{
-		for (int e = w + 1; e < count; ++e) 
+		for (int j = 0; j < i; j++)
 		{
-			if (strcmp(info[w].name, info[e].name) > 0)
+			if (strcmp(info[j].name, info[j+1].name) > 0)
 			{
-				Info temp;
-				temp = info[w];
-				info[w] = info[e];
-				info[e] = temp;
-				
+				temp = info[j];
+				info[j] = info[j+1];
+				info[j+1] = temp;
 			}
 		}
 	}
 
-	// info배열을 distance 오름차순으로 정렬
-	for (int w = 0; w < count - 1; ++w)
+	//Sort the info array in ascending distance order.(Bubble Sort, stable)
+	for (int i = count - 1; i>0; i--)
 	{
-		for (int e = w + 1; e < count; ++e)
+		for (int j = 0; j < i; j++)
 		{
-			if (info[w].distance>info[e].distance)
+			if (info[j].distance>info[j+1].distance)
 			{
-				Info temp;
-				temp = info[w];
-				info[w] = info[e];
-				info[e] = temp;
-
+				temp = info[j];
+				info[j] = info[j+1];
+				info[j+1] = temp;
 			}
 		}
 	}
 	
-
-
-
+	//Print output
 	for (int i = 0; i < count; i++) {
 		printf("%d %s\n", info[i].distance, info[i].name);
 	}
@@ -175,27 +149,21 @@ main()
 void BFS(int v)
 {
 	int i;
-	visited[v] = 1; // 정점 v를 방문했다고 표시
-	//printf("%d에서 시작\n", v);
+	queue[rear++] = v; 
 
-	queue[rear++] = v; // 큐에 v를 삽입하고 후단을 1 증가시킴
-
-	while (front < rear) // 후단이 전단과 같거나 작으면 루프 탈출
+	while (front < rear) 
 	{
-		// 큐의 첫번째에 있는 데이터를 제외하고 제외된 값을 가져오며, 전단 1 증가
 		v = queue[front++];
 		for (i = 0; i < count; i++)
 		{
-			// 정점 v와 정점 i가 만나고, 정점 i를 방문하지 않은 상태일 경우
+			//Regardless of the vertex you visited, run it and choose the larger distance of vertex
 			if (matrix[v][i] == 1)
 			{
-				visited[i] = 1; // 정점 i를 방문했다고 표시
 				if (info[i].distance < info[v].distance + 1) {
 					info[i].parent = v;
 					info[i].distance = info[v].distance + 1;
 				}
-				//printf("%d에서 %d로 이동\n", v, i);
-				queue[rear++] = i; // 큐에 i를 삽입하고 후단을 1 증가시킴
+				queue[rear++] = i; 
 			}
 		}
 	}
